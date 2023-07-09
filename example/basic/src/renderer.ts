@@ -13,3 +13,7 @@ import { client } from "./client";
 client.foo("hi").then(response => {
     console.log(response)
 })
+
+client.bar("hi").then(response => {
+    console.log(response)
+})

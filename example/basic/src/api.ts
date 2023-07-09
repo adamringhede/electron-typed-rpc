@@ -1,8 +1,9 @@
 
-// TODO Make it possible to not have to define all of them as async and return a promise if they don't need to
-
 export const methods = {
-    async foo (msg: string): Promise<string> { return msg + " from main" }
+    async foo (msg: string): Promise<string> { 
+        return await msg + " from main" 
+    },
+    bar: (msg: string): string => msg + " from main bar"
 }
 
 

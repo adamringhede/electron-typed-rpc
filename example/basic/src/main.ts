@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import { methods } from "./api";
+import { registerRpcServer } from '../../../src'
 
 function createWindow() {
   // Create the browser window.
@@ -15,7 +16,7 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  mainWindow.loadFile(path.join(__dirname, "../../../index.html"));
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -47,9 +48,4 @@ app.on("window-all-closed", () => {
 // code. You can also put them in separate files and require them here.
 
 
-Object.entries(methods).forEach(([name, fn]) => {
-  ipcMain.handle(name, (event, arg) => {
-    console.log("Received from the client", arg)
-    return fn(arg)
-  })
-})
+registerRpcServer(ipcMain, methods)
