@@ -5,11 +5,11 @@
 // Use preload.js to selectively enable features
 // needed in the renderer process.
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { ipcRenderer } = require('electron')
 
-console.log(ipcRenderer)
+import { client } from "./client";
 
-ipcRenderer.invoke('foo', 'Hi').then(response => {
+
+
+client.foo("hi").then(response => {
     console.log(response)
 })

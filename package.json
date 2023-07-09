@@ -13,9 +13,15 @@
     "tsup": "^7.1.0"
   },
   "tsup": {
-    "entry": ["src/index.ts"],
+    "entry": [
+      "src/index.ts"
+    ],
     "splitting": false,
     "sourcemap": true,
     "clean": true
+  },
+  "dependencies": {
+    "@trpc/client": "^10.34.0",
+    "@trpc/server": "^10.34.0"
   }
 }
