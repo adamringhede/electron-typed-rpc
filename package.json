@@ -1,6 +1,6 @@
 {
   "name": "electron-typed-rpc",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsup --dts",
@@ -19,9 +19,5 @@
     "splitting": false,
     "sourcemap": true,
     "clean": true
-  },
-  "dependencies": {
-    "@trpc/client": "^10.34.0",
-    "@trpc/server": "^10.34.0"
   }
 }
