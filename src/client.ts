@@ -38,9 +38,6 @@ export function createRendererEventEmitter<T extends AbstractEventsDef>(ipcRende
     }}
 }
 
-type SelectPropertyTypes<T, P> = Pick<T, {[K in keyof T]: T[K] extends P ? K : never}[keyof T]>
-type OnlyEvents<T> = SelectPropertyTypes<T, {type: any}>
-
 type AbstractEventEmitterEvents = Record<string, { broadcast(...args: any): void }>
 
 export function createMainEventsReceiver<T extends AbstractEventsDef | AbstractEventEmitterEvents | Record<string, any>>(ipcRenderer: ElectronIpcRenderer) {
