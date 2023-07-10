@@ -14,6 +14,6 @@ client.foo("hi").then(response => {
     console.log(response)
 })
 
-client.bar("hi").then(response => {
+client.bar("hi", 5).then(response => {
     console.log(response)
 })

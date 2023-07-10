@@ -14,8 +14,8 @@ type ElectronIpcMain = {
 
 export function registerRpcServer<T extends AbstractMethodsDef>(ipcMain: ElectronIpcMain, methods: T) {
     Object.entries(methods).forEach(([name, fn]) => {
-        ipcMain.handle(name, (event, arg) => {
-            return fn(arg)
+        ipcMain.handle(name, (event, ...args: unknown[]) => {
+            return fn(...args)
         })
     })
 }

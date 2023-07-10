@@ -4,6 +4,11 @@ type ElectronIpcRenderer = {
     invoke(key: string, ...args: unknown[]): Promise<unknown> 
 }
 
+type Promisify<T extends AbstractMethodsDef> = {
+    [Property in keyof T]: ReturnType<T[Property]> extends Promise<any> 
+        ? T[Property] 
+        : (...args: Parameters<T[Property]>) => Promise<ReturnType<T[Property]>>
+}
 
 export function createRpcClient<T extends AbstractMethodsDef>(ipcRenderer: ElectronIpcRenderer) {
     const dummyTarget = {};
@@ -14,5 +19,5 @@ export function createRpcClient<T extends AbstractMethodsDef>(ipcRenderer: Elect
             }
         }
     })
-    return proxyClient as {[Property in keyof T]: ReturnType<T[Property]> extends Promise<any> ? T[Property] : (...args: Parameters<T[Property]>) => Promise<ReturnType<T[Property]>>}
+    return proxyClient as Promisify<T>
 }
