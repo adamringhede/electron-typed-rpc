@@ -18,4 +18,9 @@ client.bar("hi", 5).then(response => {
     console.log(response)
 })
 
-clientEvents.update.subscribe((data) => console.log("Received from server:", data))
+
+const subscription = clientEvents.update.subscribe((data) => console.log("Received from server:", data))
+setTimeout(() => {
+    console.log("Unsubscribe")
+    subscription.unsubscribe()
+}, 5000)
