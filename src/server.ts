@@ -34,10 +34,6 @@ type BrowserWindowClass = {
 }
 
 export function createServerEventEmitter<T extends AbstractEventsDef>(BrowserWindow: BrowserWindowClass, events: T) {
-    // for each key in events, 
-    // Maybe I should just have the method already being called do this stuff. 
-    // The only downside with that is that is that I would need access to the BrowserWindow which I don't want to
-    // Better to sent it here
     return new Proxy({}, {
         get(target, key: string) {
             return {
