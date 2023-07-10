@@ -1,4 +1,4 @@
-import { AbstractEventsDef, AbstractMethodsDef } from "./common"
+import { AbstractEventsDef, AbstractMethodsDef, ElectronIpcMainEvent, IpcEventSubscription } from "./common"
 
 type ElectronIpcMainInvokeEvent = {
 
@@ -9,6 +9,8 @@ type ElectronIpcMain = {
         channel: string, 
         listener: (event: ElectronIpcMainInvokeEvent, ...args: unknown[]) => Promise<unknown> | unknown
     ) => void
+    on(channel: string, listener: (event: ElectronIpcMainEvent, ...args: unknown[]) => unknown): void
+    removeListener(channel: string, listener: (event: ElectronIpcMainEvent, ...args: unknown[]) => unknown): void
 }
 
 
@@ -46,5 +48,26 @@ export function createServerEventEmitter<T extends AbstractEventsDef>(BrowserWin
         }
     }) as {[Property in keyof T]: {
         broadcast: (data: T[Property]['type']) => void
+    }}
+}
+
+
+export function createRendererEventsServer<T extends AbstractEventsDef>(ipcMain: ElectronIpcMain) {
+    return new Proxy({}, {
+        get(target, key: string) {
+            return {
+                subscribe(callback: (data: unknown) => unknown) {
+                    const listener = (event: unknown, data: unknown) => callback(data)
+                    ipcMain.on(key, listener)
+                    return {
+                        unsubscribe() {
+                            ipcMain.removeListener(key, listener)
+                        }
+                    }
+                }
+            }
+        }
+    }) as {[Property in keyof T]: {
+        subscribe: (callback: (data: T[Property]['type']) => void) => IpcEventSubscription
     }}
 }

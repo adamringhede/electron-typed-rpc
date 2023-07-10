@@ -1,9 +1,10 @@
-import { AbstractEventsDef, AbstractMethodsDef } from "./common";
+import { AbstractEventsDef, AbstractMethodsDef, ElectronIpcMainEvent, IpcEventSubscription } from "./common";
 
 type ElectronIpcRenderer = {
-    invoke(key: string, ...args: unknown[]): Promise<unknown> 
-    on(key: string, data: unknown): void
-    removeListener(channel: string, listener: (...args: unknown[]) => unknown): void
+    invoke(channel: string, ...args: unknown[]): Promise<unknown> 
+    send(channel: string, ...args: unknown[]): void 
+    on(channel: string, listener: (event: ElectronIpcMainEvent, ...args: unknown[]) => unknown): void
+    removeListener(channel: string, listener: (event: ElectronIpcMainEvent, ...args: unknown[]) => unknown): void
 }
 
 type Promisify<T extends AbstractMethodsDef> = {
@@ -22,20 +23,32 @@ export function createRpcClient<T extends AbstractMethodsDef>(ipcRenderer: Elect
     }) as Promisify<T>
 }
 
-type SelectPropertyTypes<T, P> = Pick<T, {[K in keyof T]: T[K] extends P ? K : never}[keyof T]>
-type OnlyEvents<T> = SelectPropertyTypes<T, {type: any}>
-type IpcEventSubscription = {
-    unsubscribe(): void
+
+export function createRendererEventEmitter<T extends AbstractEventsDef>(ipcRenderer: ElectronIpcRenderer) {
+    return new Proxy({}, {
+        get(target, key: string) {
+            return {
+                emit(...args: unknown[]) {
+                    ipcRenderer.send(key, ...args)
+                }
+            }
+        }
+    }) as {[Property in keyof T]: {
+        emit: (data: T[Property]['type']) => void
+    }}
 }
 
-type AbstractEventEmitterEvents = Record<string, {broadcast(...args: any)}>
+type SelectPropertyTypes<T, P> = Pick<T, {[K in keyof T]: T[K] extends P ? K : never}[keyof T]>
+type OnlyEvents<T> = SelectPropertyTypes<T, {type: any}>
 
-export function createRpcEventsClient<T extends AbstractEventsDef | AbstractEventEmitterEvents | Record<string, any>>(ipcRenderer: ElectronIpcRenderer) {
+type AbstractEventEmitterEvents = Record<string, { broadcast(...args: any): void }>
+
+export function createMainEventsReceiver<T extends AbstractEventsDef | AbstractEventEmitterEvents | Record<string, any>>(ipcRenderer: ElectronIpcRenderer) {
     return new Proxy({}, {
         get(target, key: string) {
             return {
                 subscribe(callback: (data: unknown) => unknown) {
-                    const listener = (event: unknown, data: unknown) => callback(data)
+                    const listener = (event: ElectronIpcMainEvent, data: unknown) => callback(data)
                     ipcRenderer.on(key, listener)
                     return {
                         unsubscribe() {

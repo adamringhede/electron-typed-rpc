@@ -6,7 +6,7 @@
 // needed in the renderer process.
 
 
-import { client, clientEvents } from "./client";
+import { client, rendererEventEmitter, mainEvents } from "./client";
 
 
 
@@ -19,8 +19,13 @@ client.bar("hi", 5).then(response => {
 })
 
 
-const subscription = clientEvents.update.subscribe((data) => console.log("Received from server:", data))
+const subscription = mainEvents.update.subscribe((data) => console.log("Received from server:", data))
 setTimeout(() => {
     console.log("Unsubscribe")
     subscription.unsubscribe()
 }, 5000)
+
+
+document.addEventListener('click', (click) => {
+    rendererEventEmitter.click.emit({x: click.clientX, y: click.clientY})
+})

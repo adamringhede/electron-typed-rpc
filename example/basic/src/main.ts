@@ -1,11 +1,14 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import { methods, events } from "./api";
-import { registerRpcServer, createServerEventEmitter } from '../../../src'
-
+import { registerRpcServer, createServerEventEmitter, createRendererEventsServer } from '../../../src'
+import type { RendererEventDefs } from "./api";
 
 registerRpcServer(ipcMain, methods)
 const serverEventEmitter = createServerEventEmitter(BrowserWindow, events)
+
+const rendererEvents = createRendererEventsServer<RendererEventDefs>(ipcMain)
+rendererEvents.click.subscribe(click => console.log("Renderer click event", click))
 
 function createWindow() {
   // Create the browser window.

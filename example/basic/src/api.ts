@@ -13,9 +13,13 @@ export const events = {
     update: rpcServerEvent<string>()
 }
 
+export const rendererEvents = {
+    click: rpcServerEvent<{x: number, y: number}>()
+}
 
 export type EventDefs = typeof events
 export type MethodDefs = typeof methods
+export type RendererEventDefs = typeof rendererEvents
 
 /*
 There are more ways the same method and event definitions can be exported
