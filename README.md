@@ -55,7 +55,7 @@ export const client = createRpcClient<MethodDefs>(ipcRenderer);
 Note that for `require` to work, you need to add these to settings 
 to your webPreferences when launching the Electron window.
 
-```json
+```
 nodeIntegration: true,
 contextIsolation: false
 ```

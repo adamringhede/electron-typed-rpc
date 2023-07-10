@@ -6,7 +6,7 @@
 // needed in the renderer process.
 
 
-import { client } from "./client";
+import { client, clientEvents } from "./client";
 
 
 
@@ -17,3 +17,5 @@ client.foo("hi").then(response => {
 client.bar("hi", 5).then(response => {
     console.log(response)
 })
+
+clientEvents.update.subscribe((data) => console.log("Received from server:", data))

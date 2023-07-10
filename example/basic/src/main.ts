@@ -1,7 +1,11 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
-import { methods } from "./api";
-import { registerRpcServer } from '../../../src'
+import { methods, events } from "./api";
+import { registerRpcServer, createServerEventEmitter } from '../../../src'
+
+
+registerRpcServer(ipcMain, methods)
+const serverEventEmitter = createServerEventEmitter(BrowserWindow, events)
 
 function createWindow() {
   // Create the browser window.
@@ -28,6 +32,10 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
+  setInterval(() => {
+    serverEventEmitter.update.broadcast("an event from the server")
+  }, 1000)
+
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -47,5 +55,3 @@ app.on("window-all-closed", () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-
-registerRpcServer(ipcMain, methods)

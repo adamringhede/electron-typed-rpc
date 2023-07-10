@@ -1,7 +1,8 @@
-import { AbstractMethodsDef } from "./common";
+import { AbstractEventsDef, AbstractMethodsDef } from "./common";
 
 type ElectronIpcRenderer = {
     invoke(key: string, ...args: unknown[]): Promise<unknown> 
+    on(key: string, data: unknown): void
 }
 
 type Promisify<T extends AbstractMethodsDef> = {
@@ -20,4 +21,18 @@ export function createRpcClient<T extends AbstractMethodsDef>(ipcRenderer: Elect
         }
     })
     return proxyClient as Promisify<T>
+}
+
+export function createRpcEventsClient<T extends AbstractEventsDef>(ipcRenderer: ElectronIpcRenderer) {
+    return new Proxy({}, {
+        get(target, key: string) {
+            return {
+                subscribe(callback: (data: unknown) => unknown) {
+                    ipcRenderer.on(key, (event: unknown, data: unknown) => callback(data))
+                }
+            }
+        }
+    }) as {[Property in keyof T]: {
+        subscribe: (callback: (data: T[Property]['type']) => void) => void
+    }}
 }
